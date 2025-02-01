@@ -1,5 +1,7 @@
 package com.example.cryptocurrency.presentation.coin_detail
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cryptocurrency.common.Resource
@@ -7,9 +9,6 @@ import com.example.cryptocurrency.domain.model.CoinDetail
 import com.example.cryptocurrency.domain.use_case.get_coin.GetCoinUseCase
 import com.example.cryptocurrency.domain.use_case.get_coin.RefreshCoinDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,8 +18,8 @@ class CoinDetailViewModel @Inject constructor(
     private val refreshCoinDetailUseCase: RefreshCoinDetailUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<CoinDetailState>(CoinDetailState.Loading)
-    val state: StateFlow<CoinDetailState> = _state.asStateFlow()
+    private val _state = mutableStateOf<CoinDetailState>(CoinDetailState.Loading)
+    val state: State<CoinDetailState> = _state
 
     init {
         loadCoinDetail("bitcoin")
@@ -59,12 +58,13 @@ class CoinDetailViewModel @Inject constructor(
     }
 
     private fun handleSuccessState(data: CoinDetail?): CoinDetailState {
-        return when{
+        return when {
             data == null -> CoinDetailState.Error(
                 message = "Coin not found",
                 isRefreshing = false,
                 cachedData = getCachedData()
             )
+
             else -> CoinDetailState.Success(data)
         }
     }
