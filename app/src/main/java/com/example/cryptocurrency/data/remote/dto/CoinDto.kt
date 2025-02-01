@@ -21,6 +21,7 @@ fun CoinDto.toCoin(): Coin {
         rank = rank,
         symbol = symbol,
         type = type,
+        isActive = isActive,
 
     )
 }
