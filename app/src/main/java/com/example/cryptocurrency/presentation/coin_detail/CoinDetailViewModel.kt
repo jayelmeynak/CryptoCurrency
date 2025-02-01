@@ -2,8 +2,10 @@ package com.example.cryptocurrency.presentation.coin_detail
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.cryptocurrency.common.Constants.PARAM_COIN_ID
 import com.example.cryptocurrency.common.Resource
 import com.example.cryptocurrency.domain.model.CoinDetail
 import com.example.cryptocurrency.domain.use_case.get_coin.GetCoinUseCase
@@ -15,14 +17,16 @@ import javax.inject.Inject
 @HiltViewModel
 class CoinDetailViewModel @Inject constructor(
     private val getCoinUseCase: GetCoinUseCase,
-    private val refreshCoinDetailUseCase: RefreshCoinDetailUseCase
+    private val refreshCoinDetailUseCase: RefreshCoinDetailUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _state = mutableStateOf<CoinDetailState>(CoinDetailState.Loading)
     val state: State<CoinDetailState> = _state
+    private val coinId: String = savedStateHandle[PARAM_COIN_ID] ?: throw IllegalArgumentException("coinId is missing")
 
     init {
-        loadCoinDetail("bitcoin")
+        loadCoinDetail(coinId)
     }
 
     fun loadCoinDetail(coinId: String) {
