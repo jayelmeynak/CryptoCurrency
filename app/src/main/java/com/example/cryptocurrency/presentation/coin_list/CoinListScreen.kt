@@ -1,6 +1,7 @@
 package com.example.cryptocurrency.presentation.coin_list
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,20 +21,25 @@ import com.example.cryptocurrency.presentation.coin_list.components.CoinListItem
 @Composable
 fun CoinListScreen(
     viewModel: CoinListViewModel = hiltViewModel(),
+    outerPadding: PaddingValues,
     onItemClick: (Coin) -> Unit
 ) {
     val state = viewModel.state
     when (state.value) {
         is CoinListState.Loading -> {
-            CoinListLoadingScreen()
+            CoinListLoadingScreen(outerPadding)
         }
 
         is CoinListState.Error -> {
-            CoinListScreenError()
+            CoinListScreenError(
+                outerPadding,
+                viewModel
+            )
         }
 
         is CoinListState.Success -> {
             CoinListScreenSuccess(
+                outerPadding = outerPadding,
                 viewModel = viewModel,
                 onItemClick = {
                     onItemClick(it)
@@ -42,7 +48,9 @@ fun CoinListScreen(
         }
 
         is CoinListState.Empty -> {
-            CoinListEmptyScreen()
+            CoinListEmptyScreen(
+                outerPadding
+            )
         }
     }
 }
@@ -50,16 +58,19 @@ fun CoinListScreen(
 
 @Composable
 fun CoinListScreenSuccess(
-    viewModel: CoinListViewModel = hiltViewModel(),
+    outerPadding: PaddingValues,
+    viewModel: CoinListViewModel,
     onItemClick: (Coin) -> Unit
 ) {
     val state = viewModel.state.value as CoinListState.Success
     val coins = state.coins
     LazyColumn(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(outerPadding)
     ) {
         items(coins) { coin ->
-            CoinListItem(coin = coin){
+            CoinListItem(coin = coin) {
                 onItemClick(coin)
             }
         }
@@ -68,25 +79,32 @@ fun CoinListScreenSuccess(
 
 @Composable
 fun CoinListScreenError(
-    viewModel: CoinListViewModel = hiltViewModel()
+    outerPadding: PaddingValues,
+    viewModel: CoinListViewModel
 ) {
     val state = viewModel.state.value as CoinListState.Error
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(outerPadding)
     ) {
         Text(
             text = state.message,
             color = MaterialTheme.colorScheme.error,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 20.dp).align(Alignment.Center)
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .align(Alignment.Center)
         )
     }
 }
 
 @Composable
-fun CoinListLoadingScreen() {
+fun CoinListLoadingScreen(outerPadding: PaddingValues) {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(outerPadding)
     ) {
         CircularProgressIndicator(
             modifier = Modifier.align(Alignment.Center)
@@ -95,14 +113,20 @@ fun CoinListLoadingScreen() {
 }
 
 @Composable
-fun CoinListEmptyScreen() {
+fun CoinListEmptyScreen(
+    outerPadding: PaddingValues
+) {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(outerPadding)
     ) {
         Text(
             text = "No coins found",
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 20.dp).align(Alignment.Center),
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .align(Alignment.Center),
             style = MaterialTheme.typography.bodyLarge
         )
     }
